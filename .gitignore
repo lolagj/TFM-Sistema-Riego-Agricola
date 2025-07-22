@@ -1,0 +1,10 @@
+.env
+sist_riego/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdm.toml
+*.pdm.lock
+*.egg-info/
