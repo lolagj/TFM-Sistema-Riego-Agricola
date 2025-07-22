@@ -1,3 +1,4 @@
+#Entornos Virtuales
 .env
 sist_riego/
 venv/
@@ -8,3 +9,21 @@ __pycache__/
 *.pdm.toml
 *.pdm.lock
 *.egg-info/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Archivos temporales de sistemas
+.DS_Store
+Thumbs.db
+
+# Config VSCode
+.vscode/
