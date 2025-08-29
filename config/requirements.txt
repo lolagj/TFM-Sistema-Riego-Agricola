@@ -6,3 +6,8 @@ mlflow
 dvc
 ydata_profiling
 streamlit
+seaborn
+apache-airflow
+requests
+plotly
+folium

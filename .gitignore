@@ -1,4 +1,4 @@
-#Entornos Virtuales
+#Virtual Env
 .env
 sist_riego/
 venv/
@@ -21,9 +21,15 @@ __pycache__/
 # Logs
 *.log
 
-# Archivos temporales de sistemas
+# Temporal Files
 .DS_Store
 Thumbs.db
 
 # Config VSCode
 .vscode/
+
+#Gemini CLI
+GEMINI.md
+
+
+file:

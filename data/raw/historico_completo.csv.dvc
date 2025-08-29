@@ -1,0 +1,5 @@
+outs:
+- md5: 86f6707e038d66ca30688bcc46607aa4
+  size: 117429092
+  hash: md5
+  path: historico_completo.csv
