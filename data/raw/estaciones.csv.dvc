@@ -1,0 +1,5 @@
+outs:
+- md5: 5e6d1148d6915a788bd350f002baaaa0
+  size: 9453
+  hash: md5
+  path: estaciones.csv

@@ -1,6 +1,5 @@
 #Virtual Env
 .env
-sist_riego/
 venv/
 __pycache__/
 *.pyc
