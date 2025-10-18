@@ -28,5 +28,4 @@ Thumbs.db
 .vscode/
 
 file:
-
-notebooks/modelado/mlruns
+mlruns
