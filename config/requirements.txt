@@ -12,3 +12,4 @@ requests
 plotly
 folium
 pyproj
+xgboost
