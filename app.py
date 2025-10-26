@@ -52,9 +52,7 @@ with st.sidebar:
             st.warning("No hay datos para la estación seleccionada.")
 
 
-
 hoy = date.today()
-
 
 
 
