@@ -5,7 +5,7 @@ import altair as alt
 import plotly.express as px
 import pandas as pd
 from datetime import date
-
+from joblib import load
 
 st.set_page_config(
     page_title="Sistema de ayuda a la toma de desición Riego Agrícola: Olivo",
@@ -56,12 +56,8 @@ hoy = date.today()
 
 
 
+modelo = load('notebooks/modelado/XGBoost_modelo_final.joblib')
 
-model_name = "xgboost-tunning-reducido"
-model_version = "1"
-
-model_uri = f"models:/{model_name}/{model_version}"
-model = mlflow.xgboost.load_model(model_uri)
 
 #model.predict()
 
