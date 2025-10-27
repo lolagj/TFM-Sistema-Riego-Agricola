@@ -15,19 +15,18 @@ st.set_page_config(
 
 alt.theme.enable("dark")
 
-df = pd.read_csv("data/processed/datos_integrados.csv", sep =";")
-estaciones = pd.read_csv("data/raw/estaciones.csv", sep =",")
+df = pd.read_csv("data/demo_app/df_demo.csv", sep =";")
+
 
 with st.sidebar:
     st.title('💧 Sistema de ayuda a la toma de desición Riego Agrícola: Olivo')
     
-    mun_list = list(estaciones['nombre'].unique())[::-1]
+    mun_list = list(df['nombre'].unique())[::-1]
     selected_mun = st.selectbox('Selecciona un municipio', mun_list, index=len(mun_list)-1)
     df_selected_mun = df[df.nombre == selected_mun]
     color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
     cultivo = st.selectbox('Seleccione cultivo', "Olivo")
 
-    fecha_inicio = list(estaciones['nombre'].unique())[::-1]
     df['fecha'] = pd.to_datetime(df['fecha'])
 
     if selected_mun:
