@@ -30,3 +30,4 @@ Thumbs.db
 file:
 mlruns
 .dvc
+notebooks/despliegue/app.ipynb
