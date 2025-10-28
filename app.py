@@ -8,6 +8,9 @@ from datetime import date
 from joblib import load
 from src.transform_input import coordenadas_gms, transform_dia_año, transform_mes_año, extract_fecha
 from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 st.set_page_config(
     page_title="Sistema de ayuda a la toma de desición Riego Agrícola: Olivo",
@@ -25,10 +28,9 @@ lon, lat =coordenadas_gms(coordenadas["xutm"],coordenadas["yutm"])
 with st.sidebar:
     st.title('💧 Sistema de ayuda a la toma de decisión de Riego Agrícola: Olivo')
     
-    mun_list = sorted(list(df['nombre'].unique()), reverse=True)
+    mun_list = sorted(list(df['nombre'].unique()), reverse=False)
     selected_mun = st.selectbox('Selecciona un municipio', mun_list, index=len(mun_list)-1)
     df_selected_mun = df[df.nombre == selected_mun]
-    color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
     cultivo = st.selectbox('Seleccione cultivo', "Olivo")
 
     df['fecha'] = pd.to_datetime(df['fecha'])
@@ -38,20 +40,6 @@ with st.sidebar:
         fecha_min = df_mun['fecha'].min()
         fecha_max = df_mun['fecha'].max()
         st.write(f"Datos disponibles para esta estación desde el {fecha_min} hasta el {fecha_max}")
-        rango_seleccionado = st.date_input("Selecciona un rango de fechas",
-            value=(fecha_min, fecha_max), 
-            min_value=fecha_min,               
-            max_value=fecha_max               
-        )
-
-        if len(rango_seleccionado) == 2:
-            fecha_inicio = rango_seleccionado[0]
-            fecha_fin = rango_seleccionado[1]
-            
-            st.success(f"Rango seleccionado: {fecha_inicio} al {fecha_fin}")
-            
-        else:
-            st.warning("No hay datos para la estación seleccionada.")
 
 
 hoy = date.today()
@@ -64,15 +52,10 @@ modelo = load("notebooks/modelado/XGBoost_modelo_final.joblib")
 scaler = load('notebooks/preparacion_datos/standard_scaler.joblib')
 
 
-
-st.header("Predicción de Evapotranspiración para hoy")
-
+st.header(f"Predicción de Evapotranspiración para hoy ({hoy})")
 with st.form("formulario_prediccion"):
-    
     st.write("Introduce los parámetros meteorológicos diarios:")
-    
     col1, col2, col3= st.columns(3)
-    
     with col1:
         temp_max = st.number_input(
             "Temperatura Máxima (°C)", 
@@ -88,7 +71,6 @@ with st.form("formulario_prediccion"):
             value=15.0, 
             step=0.1
         )
-
     with col2:
         humedad_max = st.slider(
             "Humedad Relativa Máxima(%)", 
@@ -100,10 +82,8 @@ with st.form("formulario_prediccion"):
             "Humedad Relativa Mínima (%)", 
             min_value=0, 
             max_value=100, 
-            value=30
+               value=30
         )          
-
-
     with col3:
         viento = st.number_input(
             "Velocidad del Viento (m/s)", 
@@ -113,17 +93,11 @@ with st.form("formulario_prediccion"):
             step=0.1
         )
         submitted = st.form_submit_button("Ejecutar Predicción")
-
-
-
 mun_data = coordenadas[coordenadas['nombre']==selected_mun]
-
 lon, lat = coordenadas_gms(mun_data.xutm, mun_data.yutm)
 if submitted:
     st.markdown("---")
     st.subheader("Resultado de la Predicción")
-
-
     datos_para_modelo = {
         'tempMax': temp_max,
         'tempMin': temp_min,
@@ -140,7 +114,6 @@ if submitted:
         'mes_sin': sin_mes, 
         'mes_cos': cos_mes
     }
-
     #Scaler entrenado con conjunto completo. Como estamos evaluando subconjunto, es necesario rehacerlo.
     columnas_originales = [
     'tempMedia', 'tempMax', 'tempMin', 'humedadMedia', 'humedadMax',
@@ -148,12 +121,10 @@ if submitted:
     'dirVientoVelMax', 'radiacion', 'precipitacion', 'altitud', 'lon',
     'lat', 'dia_del_año_sin', 'dia_del_año_cos', 'año', 'mes', 'mes_sin',
     'mes_cos']
-
     columnas_subset = [
     'tempMax', 'tempMin', 'humedadMax', 'humedadMin', 'velViento', 
     'altitud', 'lon', 'lat', 'dia_del_año_sin', 'dia_del_año_cos', 
     'año', 'mes', 'mes_sin', 'mes_cos']
-
     indices_para_conservar = [columnas_originales.index(col) for col in columnas_subset]
     media_original = scaler.mean_
     escala_original = scaler.scale_  
@@ -163,26 +134,18 @@ if submitted:
     scaler_subset.mean_ = media_subset
     scaler_subset.scale_ = escala_subset
     scaler_subset.n_features_in_ = len(columnas_subset)
-    
     input = pd.DataFrame(datos_para_modelo, index=[0])
     input = scaler_subset.transform(input.astype(float))
     print(input)
-
     with st.spinner("Ejecutando modelo..."):
-        
         resultado_prediccion = modelo.predict(input)
-    
-    
     st.success("¡Predicción completada!")
-    
     col3, col4= st.columns(2)
-
     with col3:
         st.metric(
-            label="Evapotranspiración de referencia (ETo) Predicha",
+            label="Evapotranspiración de referencia (ETo) resultante",
             value=f"{resultado_prediccion[0]:.2f} mm/día"
         )
-
     kc_mes = {
         12: 0.5,
         1: 0.5,
@@ -195,13 +158,12 @@ if submitted:
         8: 0.60,
         9: 0.60,
         10:0.65,
-        11:0.65,
+        11:0.65
     }
     with col4:
         st.metric(
-            label="Evapotranspiración del cultivo (ETc)",
-
-        
+            label=f"Evapotranspiración del cultivo (ETc) calculada, tomando como Kc: {kc_mes.get(mes)}",
             value=f"{resultado_prediccion[0]*kc_mes.get(mes):.2f} mm/día"
         )    
     
+ 
